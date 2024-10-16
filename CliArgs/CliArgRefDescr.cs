@@ -98,6 +98,10 @@ namespace CliArgs
                     arg.tag = mm;
                     if (hl != null)
                         arg.helpDescr = hl.ToString().TrimEnd();
+
+                    arg.isBoolOnly = ((mm is FieldInfo fi) && (fi.FieldType == typeof(bool)))
+                        || ((mm is PropertyInfo pi) && (pi.PropertyType == typeof(bool)));
+
                     keys.Add(arg);
                 }
                 else if (vl != null)
