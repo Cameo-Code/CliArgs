@@ -73,6 +73,34 @@ namespace CliArgs
 
         private object ConvertToTargetType(string val, Type trgType)
         {
+            if (trgType == typeof(sbyte))
+                return Convert.ToSByte(val);
+            if (trgType == typeof(short))
+                return Convert.ToInt16(val);
+            else if (trgType == typeof(int))
+                return Convert.ToInt32(val);
+            else if (trgType == typeof(long))
+                return Convert.ToInt64(val);
+            else if (trgType == typeof(byte))
+                return Convert.ToByte(val);
+            else if (trgType == typeof(UInt16))
+                return Convert.ToUInt16(val);
+            else if (trgType == typeof(UInt32))
+                return Convert.ToUInt32(val);
+            else if (trgType == typeof(UInt64))
+                return Convert.ToUInt64(val);
+            else if (trgType == typeof(double))
+            {
+                double d;
+                if (double.TryParse(val, out d))
+                    return d;
+            }
+            else if (trgType == typeof(float))
+            {
+                float f;
+                if (float.TryParse(val, out f))
+                    return f;
+            }
             return val;
         }
 
