@@ -4,13 +4,28 @@ using System.Text;
 
 namespace CliArgs
 {
+    // The key description
     public class CliArgKey
     {
+        // just a logical name. not used anywhere?
         public string logicalName;
+        
+        // the list of full-name. (short keys are always separated by whitespace)
         public string[] fullKeys;
+        
+        // the list of short keys. (short keys are always separated by whitespace)
+        // and are using "short prefixes)
         public string[] shortKeys;
+
+        // if set to true, then no value is expected when parsing the key
+        // no attempt to parse the value is made.
         public bool isBoolOnly;
+        
+        // popuplated as needed 
         public object tag;
+
+        // help description (used only during help generation)
+        public string helpDescr;
     }
 
     // The basic definition of the command-line OR command-line action

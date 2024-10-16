@@ -38,4 +38,16 @@ namespace CliArgs
             Index = aindex;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
+    // a line of help description
+    public class CliHelpAttribute : Attribute
+    {
+        public string Line;
+        public CliHelpAttribute(string line = "")
+        {
+            Line = line;
+        }
+    }
+
 }

@@ -61,6 +61,7 @@ namespace CliArgs
                 List<CliFullAttribute> fl = null;
                 List<CliShortAttribute> sl = null;
                 List<CliValueAttribute> vl = null;
+                StringBuilder hl = null;
 
                 object[] att = mm.GetCustomAttributes(true);
                 foreach (var a in att)
@@ -80,6 +81,11 @@ namespace CliArgs
                         if (vl == null) vl = new List<CliValueAttribute>();
                         vl.Add(v);
                     }
+                    else if (a is CliHelpAttribute h)
+                    {
+                        if (hl == null) hl = new StringBuilder();
+                        hl.AppendLine(h.Line);
+                    }
                 }
 
 
@@ -90,6 +96,8 @@ namespace CliArgs
                     if (fl != null) arg.fullKeys = ToArray(fl);
                     if (sl != null) arg.shortKeys = ToArray(sl);
                     arg.tag = mm;
+                    if (hl != null)
+                        arg.helpDescr = hl.ToString();
                     keys.Add(arg);
                 }
                 else if (vl != null)

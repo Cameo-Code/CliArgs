@@ -9,6 +9,20 @@ namespace CliArgs
     public static class CliArgRef
     {
 
+        private static CliArgRefDescr autoDescr;
+        public static CliArgRefDescr AutoDescr
+        {
+            get
+            {
+                if (autoDescr == null)
+                {
+                    var tp = GetStartupObjectType();
+                    autoDescr = CliArgRefDescr.Alloc(tp);
+                }
+                return autoDescr;
+            }
+        }
+
         // returning the type of the startup object. StarupObject is specified at application properties
         public static Type GetStartupObjectType()
         {
@@ -34,11 +48,17 @@ namespace CliArgs
         //
         public static bool ParseArgs(string[] args)
         {
-            var tp = GetStartupObjectType();
-            CliArgRefDescr descr = CliArgRefDescr.Alloc(tp);
+            var d = AutoDescr;
             // assuming it's a static class anyway!
-            CliArgRefApply apply = new CliArgRefApply(descr, null);
-            return CliArgUtils.ParseApply(args, descr, apply);
+            CliArgRefApply apply = new CliArgRefApply(d, null);
+            return CliArgUtils.ParseApply(args, d, apply);
+        }
+
+        public static void PrintHelp()
+        {
+            var d = AutoDescr;
+            var helpText = CliArgHelpGen.GenerateHelp(d);
+            Console.WriteLine(helpText);
         }
     }
 }
