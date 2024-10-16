@@ -97,7 +97,7 @@ namespace CliArgs
                     if (sl != null) arg.shortKeys = ToArray(sl);
                     arg.tag = mm;
                     if (hl != null)
-                        arg.helpDescr = hl.ToString();
+                        arg.helpDescr = hl.ToString().TrimEnd();
                     keys.Add(arg);
                 }
                 else if (vl != null)
