@@ -62,8 +62,10 @@ namespace CliArgs
         public static string GetSortKey(CliArgKey k)
         {
             if (k == null) return string.Empty;
-            if (k.fullKeys.Length > 0) return k.fullKeys[0];
-            if (k.shortKeys.Length > 0) return k.shortKeys[0];
+            if ((k.fullKeys != null) && (k.fullKeys.Length > 0))
+                return k.fullKeys[0];
+            if ((k.shortKeys != null) && (k.shortKeys.Length > 0)) 
+                return k.shortKeys[0];
             return string.Empty;
         }
 
@@ -76,12 +78,16 @@ namespace CliArgs
         public static string GetSVNLikeKeys(CliArgKey key, string shortPfx, string fullPfx)
         {
             string s = key.HelpGetShortKey();
-            if (string.IsNullOrEmpty(shortPfx)) s = "";
-            else s = $"{shortPfx}{s}";
+            if ((string.IsNullOrEmpty(shortPfx)) || string.IsNullOrEmpty(s)) 
+                s = "";
+            else 
+                s = $"{shortPfx}{s}";
 
             string f = key.HelpGetFullKey();
-            if (string.IsNullOrEmpty(fullPfx)) f = "";
-            else f = $"{fullPfx}{f}";
+            if ((string.IsNullOrEmpty(fullPfx)) || string.IsNullOrEmpty(f)) 
+                f = "";
+            else
+                f = $"{fullPfx}{f}";
 
             if ((s == "")&&(f ==""))
                 return "";
