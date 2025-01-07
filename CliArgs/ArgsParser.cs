@@ -69,6 +69,8 @@ namespace CliArgs
 
         private List<string> boundShortKeys;
 
+        public bool isTryingKeys = true;
+
         public void SetDescr(CliArgDescr descr)
         {
             this.descr = descr;
@@ -205,16 +207,17 @@ namespace CliArgs
             }
 
             string keypfx;
-            if (IsFullKey(descr, ar, out keypfx))
+            if ((isTryingKeys) && (IsFullKey(descr, ar, out keypfx)))
             {
                 return ParseFullKey(keypfx);
             }
-            else if (IsShortKey(descr, ar, out keypfx))
+            else if ((isTryingKeys) && (IsShortKey(descr, ar, out keypfx)))
             {
                 return ParseShortKey(keypfx);
             }
             else
             {
+                if (descr.stopKeyParsingOnValue) isTryingKeys = false;
                 inpIdx++;
                 return ArgResult.AllocValue(ar);
             }

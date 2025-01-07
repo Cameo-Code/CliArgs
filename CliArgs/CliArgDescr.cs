@@ -120,6 +120,10 @@ namespace CliArgs
 
         public bool allowCombineShortKey; // i.e. -iab, means -i -a -b.. quite often used in unix tools
 
+        // stops expecting keys on the first value found
+        // dumps the rest of the strings as values
+        public bool stopKeyParsingOnValue = true;
+
         public static CliArgDescr Default2000 = new CliArgDescr {
             fullKeyPrefix = new string[] { "--" },
             fullKeySeparator = new string[] { "=" },
