@@ -55,6 +55,7 @@ namespace CliArgs
     // shows the "action" property to be filled
     // "action" is expected to be specified prior to all the keys
     public class CliActionAttribute : Attribute 
-    { 
+    {
+        public string ActValue;
     }
 }

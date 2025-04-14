@@ -11,6 +11,9 @@ namespace CliArgs
     {
         public Type rootType;
         public List<ValueByReflect> vals = new List<ValueByReflect>();
+        public Dictionary<string, ValueByReflect> acts = new Dictionary<string, ValueByReflect>();
+        public ValueByReflect defAction;
+
         public CliArgRefDescr()
         {
 
@@ -43,11 +46,11 @@ namespace CliArgs
             return result.ToArray();
         }
 
-        public static void PopulateKeys(Type tp, CliArgDescr dst, List<ValueByReflect> vals)
+        public static void PopulateKeys(Type tp, CliArgRefDescr dst)
         {
             List<CliArgKey> keys = new List<CliArgKey>();
+            List<ValueByReflect> vals = dst.vals;
 
-            
             foreach (var mm in tp.GetMembers(BindingFlags.Public 
                 | BindingFlags.NonPublic 
                 | BindingFlags.Static 
@@ -62,6 +65,10 @@ namespace CliArgs
                 List<CliShortAttribute> sl = null;
                 List<CliValueAttribute> vl = null;
                 StringBuilder hl = null;
+
+                bool isAction = false;
+                bool isAnyAction = false;
+                List<string> actStr = new List<string>();
 
                 object[] att = mm.GetCustomAttributes(true);
                 foreach (var a in att)
@@ -86,6 +93,14 @@ namespace CliArgs
                         if (hl == null) hl = new StringBuilder();
                         hl.AppendLine(h.Line);
                     }
+                    else if (a is CliActionAttribute act)
+                    {
+                        isAction = true;
+                        if (string.IsNullOrEmpty(act.ActValue))
+                            isAnyAction = true;
+                        else 
+                            actStr.Add(act.ActValue);
+                    }
                 }
 
 
@@ -109,8 +124,29 @@ namespace CliArgs
                     var v = vl[0];
                     vals.Add(new ValueByReflect(mm, v.Index));
                 }
+                else if (isAction)
+                {
+                    var vr = new ValueByReflect(mm, -1);
+                    vr.isAction = true;
+                    foreach (var aa in actStr)
+                        dst.acts[aa] = vr;
+                    if (isAnyAction)
+                        dst.defAction = vr;
+                }
             }
             dst.logicalKeys = keys.ToArray();
+
+
+            if ((dst.defAction != null) || (dst.acts.Count > 0))
+            {
+                dst.actionUse = ActionUse.Single;
+                List<string> acts = new List<string>();
+                acts.AddRange(dst.acts.Keys);
+                dst.actions = acts.ToArray();
+            }
+            else
+                dst.actionUse = ActionUse.None;
+
         }
 
         public static CliArgRefDescr Alloc(Type tp, CliArgDescr basedecl = null)
@@ -119,7 +155,7 @@ namespace CliArgs
                 basedecl = CliArgDescr.Default2000;
             CliArgRefDescr result = new CliArgRefDescr(basedecl);
             result.rootType = tp;
-            CliArgRefDescr.PopulateKeys(tp, result, result.vals);
+            CliArgRefDescr.PopulateKeys(tp, result);
             return result;
         }
 
@@ -130,6 +166,7 @@ namespace CliArgs
     {
         public MemberInfo member;
         public int index;
+        public bool isAction;
         public ValueByReflect()
         {
 

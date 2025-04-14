@@ -5,9 +5,9 @@ using System.Text;
 namespace CliArgs
 {
     public enum ArgResultType
-    { 
-        Key,  // value is the value of the key, if the key is passed with the value
+    {
         Value,  // value is the value of the value
+        Key,  // value is the value of the key, if the key is passed with the value
         Action,  // "value: is the value of action
         Error // "value" contains the error mesasge
     }
@@ -15,7 +15,7 @@ namespace CliArgs
     public class ArgResult
     {
         public string value = string.Empty;
-        public ArgResultType argType;
+        public ArgResultType argType = ArgResultType.Value;
         public bool hasValue; // it's only used if "isKey" is used
                               // it would be set to false, if no value was specified (i.e. end of line)
                               // or the next value was the key

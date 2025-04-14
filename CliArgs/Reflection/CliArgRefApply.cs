@@ -201,6 +201,21 @@ namespace CliArgs
         public void ActionStart(string action, bool isKnown, CliArgDescr logicalDescr)
         {
 
+            CliArgRefDescr r = logicalDescr as CliArgRefDescr;
+            if (r == null) r = descr;
+            if (r == null) return;
+
+            ValueByReflect actval = r.defAction;
+            if (isKnown)
+            {
+                r.acts.TryGetValue(action, out actval);
+            }
+            if (actval == null) return;
+            
+            if (actval.member.DeclaringType == typeof(bool))
+                ApplyToMemberBool(actval.member, true);
+            else 
+                ApplyToMember(actval.member, action);
         }
 
     }
