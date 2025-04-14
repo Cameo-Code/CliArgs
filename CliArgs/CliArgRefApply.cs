@@ -5,6 +5,7 @@ using System.Reflection;
 
 namespace CliArgs
 {
+    // The reflection-based applicator of the parsed values
     public class CliArgRefApply: ICliArgApply
     {
         private object inst;
@@ -195,6 +196,11 @@ namespace CliArgs
             var mm = key.tag as MemberInfo;
             if (mm != null)
                 ApplyToMember(mm, value);
+        }
+
+        public void ActionStart(string action, bool isKnown, CliArgDescr logicalDescr)
+        {
+
         }
 
     }

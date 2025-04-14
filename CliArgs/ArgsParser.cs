@@ -4,10 +4,18 @@ using System.Text;
 
 namespace CliArgs
 {
+    public enum ArgResultType
+    { 
+        Key,  // value is the value of the key, if the key is passed with the value
+        Value,  // value is the value of the value
+        Action,  // "value: is the value of action
+        Error // "value" contains the error mesasge
+    }
+
     public class ArgResult
     {
         public string value = string.Empty;
-        public bool isKey;
+        public ArgResultType argType;
         public bool hasValue; // it's only used if "isKey" is used
                               // it would be set to false, if no value was specified (i.e. end of line)
                               // or the next value was the key
@@ -16,6 +24,10 @@ namespace CliArgs
         public string rawKeyName = string.Empty; // the actual key name as found in the command-line
         public bool isRawKeyShort;
         public CliArgKey logicalKey; // key scription. null, if the key found is unknown or unspecified
+        public CliArgDescr logicalDescr; // the description. only used with "action"
+
+        public bool isAction => argType == ArgResultType.Action;
+        public bool isKey => argType == ArgResultType.Key;
 
         public static ArgResult AllocValue(string s)
         {
@@ -30,7 +42,7 @@ namespace CliArgs
         public static ArgResult AllocKey(string rawKey,  bool isShortKey, CliArgKey logKey, string value = null)
         {
             ArgResult result = new ArgResult();
-            result.isKey = true;
+            result.argType = ArgResultType.Key;
             result.hasValue = (value != null);
             if (value != null)
                 result.value = value;
@@ -59,17 +71,50 @@ namespace CliArgs
         {
             return AllocFullKey(rawKey, logKey, null);
         }
+    
+        public static ArgResult AllocAction(string rawAction, CliArgDescr keysDescr)
+        {
+            return new ArgResult {
+                argType = ArgResultType.Action,
+                rawKeyName = rawAction,
+                value = rawAction,
+                logicalDescr = keysDescr
+            };
+        }
+
+        public static ArgResult AllocError(string errorName)
+        {
+            return new ArgResult
+            {
+                argType = ArgResultType.Error,
+                value = errorName
+            };
+        }
     }
+
+    // 
+    // %action% %key1% %key2% %key3% %value1% %value2% %value3%
 
     public class ArgsParser
     {
+        public enum ParserState
+        { 
+            // expecting to find the action (prior to any key)
+            Action,
+            // expecting to find the key 
+            Keys,
+            // expecting to find values
+            Values,
+        }
+
+
         private string[] inp;
         private int inpIdx;
         private CliArgDescr descr;
 
         private List<string> boundShortKeys;
 
-        public bool isTryingKeys = true;
+        public ParserState state = ParserState.Action;
 
         public void SetDescr(CliArgDescr descr)
         {
@@ -84,6 +129,7 @@ namespace CliArgs
 
         private ArgResult ParseFullKey(string keypfx)
         {
+
             string ar = inp[inpIdx];
             inpIdx++;
             string rawkey;
@@ -188,9 +234,33 @@ namespace CliArgs
             return ArgResult.AllocShortKeyNoVal(k, keyDescr);
         }
 
+        private ArgResult TryParseAction(string curStr)
+        {
+            if (IsAnyKey(descr, curStr))
+            {
+                // we found the key, even though we were expecting an action
+                // that means we either should assume a default key
+
+                if (descr.actionUse == ActionUse.SingleStrict)
+                {
+                    // todo: fail the parsing!
+                    return ArgResult.AllocError("Action is expected, but key found");
+                }
+
+                // we found the key! and not an action
+                // thus we would pretend as we have found an action, even though we didn't
+                if (!string.IsNullOrEmpty(descr.defaultAction))
+                    return ArgResult.AllocAction(descr.defaultAction, descr);
+                return null;
+            }
+
+
+            inpIdx++;
+            return ArgResult.AllocAction(curStr, descr);
+        }
+
         public ArgResult FindNext()
         {
-
             if ((boundShortKeys != null)&&(boundShortKeys.Count > 0))
             {
                 return PopPendingShortKey();
@@ -206,18 +276,32 @@ namespace CliArgs
                 return ArgResult.AllocValue(ar);
             }
 
+            if (state == ParserState.Action)
+            {
+                // we would switch to keys anyway.
+                state = ParserState.Keys;
+                if (descr.actionUse != ActionUse.None)
+                {
+                    var res = TryParseAction(ar);
+                    if (res != null) 
+                        return res;
+                }
+            }
+
+
             string keypfx;
-            if ((isTryingKeys) && (IsFullKey(descr, ar, out keypfx)))
+            if ((state == ParserState.Keys) && (IsFullKey(descr, ar, out keypfx)))
             {
                 return ParseFullKey(keypfx);
             }
-            else if ((isTryingKeys) && (IsShortKey(descr, ar, out keypfx)))
+            else if ((state == ParserState.Keys) && (IsShortKey(descr, ar, out keypfx)))
             {
                 return ParseShortKey(keypfx);
             }
             else
             {
-                if (descr.stopKeyParsingOnValue) isTryingKeys = false;
+                if (descr.stopKeyParsingOnValue)
+                    state = ParserState.Values;
                 inpIdx++;
                 return ArgResult.AllocValue(ar);
             }

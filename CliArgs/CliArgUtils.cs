@@ -6,7 +6,9 @@ namespace CliArgs
 {
     public static class CliArgUtils
     {
-        public static bool ParseApply(string[] args, CliArgDescr descr, ICliArgApply apply)
+        // Parsing the arguments parsed at "args", using the specified description
+        // And applying the results immediately
+        public static bool ParseAndApply(string[] args, CliArgDescr descr, ICliArgApply apply)
         {
             ArgsParser p = new ArgsParser();
             p.SetDescr(descr);
@@ -31,7 +33,12 @@ namespace CliArgs
                         apply.UnknownKey(res.rawKeyName, res.value);
                     else
                         apply.UnknownKeyNoVal(res.rawKeyName);
-                } else
+                } else if (res.isAction)
+                {
+                    bool isKnown = (res.logicalDescr != null) && (res.logicalDescr.IsActionKnown(res.value));
+                    apply.ActionStart(res.value, isKnown, res.logicalDescr);
+                }
+                else
                 {
                     apply.AddValue(res.value, paramIdx);
                     paramIdx++;

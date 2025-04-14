@@ -103,12 +103,25 @@ namespace CliArgs
 
     }
 
-    // todo!
-    public class CliArgAction : CliArgSetOfKeys
-    {
 
+    // The defintion of "action" switch to be passed
+    public enum ActionUse
+    { 
+        // No action is used and is not expected
+        None,
+        // There's a single word of action that might be specified
+        Single,
+        
+        // There's a single word of action that MUST BE specified
+        // if action omits, the arguments set is considered to be invalid
+        SingleStrict
+
+        //todo:
+        // Multiple  (similar to "ImageMagick")
     }
 
+
+    // The description of the expected argulemtns
     public class CliArgDescr : CliArgSetOfKeys
     {
         public string[] fullKeyPrefix; // i.e. --
@@ -123,6 +136,17 @@ namespace CliArgs
         // stops expecting keys on the first value found
         // dumps the rest of the strings as values
         public bool stopKeyParsingOnValue = true;
+
+
+        // true, if the action is used (action is specified prior to keys)
+        // Assumption is made that the action is a single string 
+        // mulitple actions are not supported
+        public ActionUse actionUse = ActionUse.None;
+        // default action, if none was parsed or specified
+        public string defaultAction;
+        // the list of the possible actions. 
+        public string[] actions;
+
 
         public static CliArgDescr Default2000 = new CliArgDescr {
             fullKeyPrefix = new string[] { "--" },
@@ -145,10 +169,19 @@ namespace CliArgs
         }
 
 
-
         public bool HasFullKeySeparator()
         {
             return ((fullKeySeparator) != null && (fullKeySeparator.Length > 0));
+        }
+
+        public bool IsActionKnown(string action)
+        {
+            foreach(var a in actions)
+            {
+                if (string.Compare(a, action, !isCaseSensitive) == 0)
+                    return true;
+            }
+            return false;
         }
     }
 }

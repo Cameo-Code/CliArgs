@@ -7,6 +7,10 @@ namespace CliArgs
     // The generic interface to apply parsed values
     public interface ICliArgApply
     {
+        // an "action" has been identified
+        // "isKnown" flag indicates if the action string is a part of the "known" actions
+        void ActionStart(string action, bool isKnown, CliArgDescr descr);
+
         // called before any other paramter, but only if some arguments were provided
         // if no arguments were provided the method is never called
         void ParamsStart();

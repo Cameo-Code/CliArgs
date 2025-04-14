@@ -5,11 +5,24 @@ using System.Reflection;
 
 namespace CliArgs
 {
-    // reflection utility
+    // Reflection utility.
+    // Allows to parse the cliarguments description from the reflection information
+
+
     public static class CliArgRef
     {
 
         private static CliArgRefDescr autoDescr;
+
+        // Returns the reflection based on the startup object 
+        // (which is expected to be something like "Program"...
+        // actual class name is determined based on the launching Assemebly
+        //
+        // But the class is determined by the EntryPoint. in other words,
+        // the class that is contains the called Main() method
+        // 
+        // Once parsed, the same description is returned in all further calls.
+        //
         public static CliArgRefDescr AutoDescr
         {
             get
@@ -51,7 +64,7 @@ namespace CliArgs
             var d = AutoDescr;
             // assuming it's a static class anyway!
             CliArgRefApply apply = new CliArgRefApply(d, null);
-            return CliArgUtils.ParseApply(args, d, apply);
+            return CliArgUtils.ParseAndApply(args, d, apply);
         }
 
         public static void PrintHelp()

@@ -50,4 +50,11 @@ namespace CliArgs
         }
     }
 
+
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    // shows the "action" property to be filled
+    // "action" is expected to be specified prior to all the keys
+    public class CliActionAttribute : Attribute 
+    { 
+    }
 }
