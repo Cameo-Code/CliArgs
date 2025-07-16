@@ -207,7 +207,7 @@ namespace CliArgs
                     return PopPendingShortKey();
             }
 
-            bool tryNextVal = !logKey.isBoolOnly;
+            bool tryNextVal = (logKey == null) || (!logKey.isBoolOnly);
             bool hasValue = false;
             string val = "";
             if ((tryNextVal) && (inpIdx < inp.Length))
