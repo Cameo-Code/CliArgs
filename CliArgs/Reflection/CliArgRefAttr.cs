@@ -57,5 +57,9 @@ namespace CliArgs
     public class CliActionAttribute : Attribute 
     {
         public string ActValue;
+        public CliActionAttribute(string act = "")
+        {
+            ActValue = act;
+        }
     }
 }

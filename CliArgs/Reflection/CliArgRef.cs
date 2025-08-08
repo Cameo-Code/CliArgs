@@ -67,10 +67,15 @@ namespace CliArgs
             return CliArgUtils.ParseAndApply(args, d, apply);
         }
 
-        public static void PrintHelp()
+        public static string GenerateHelpAuto()
         {
             var d = AutoDescr;
-            var helpText = CliArgHelpGen.GenerateHelp(d);
+            return CliArgHelpGen.GenerateHelp(d);
+        }
+
+        public static void PrintHelp()
+        {
+            var helpText = GenerateHelpAuto();
             Console.WriteLine(helpText);
         }
     }

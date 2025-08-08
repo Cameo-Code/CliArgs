@@ -4,11 +4,14 @@ using System.Text;
 
 namespace CliArgs
 {
-    public class CliArgHelpGen
+    // The utility class that generates the help text
+    public static class CliArgHelpGen
     {
         public static string GenerateHelp(CliArgDescr descr)
         {
             if (descr == null) return "";
+
+            // sorting keys by their values
             List<CliArgKey> keys = new List<CliArgKey>();
             keys.AddRange(descr.logicalKeys);
 
@@ -32,8 +35,25 @@ namespace CliArgs
             }
 
             string pfx = "  ";
+
+
             StringBuilder bld = new StringBuilder();
-            foreach(var hd in helpList)
+
+            // help for actions
+            if ((descr.actions != null) && (descr.actions.Length > 0))
+            {
+                bld.AppendLine("Actions:");
+                foreach (var a in descr.actions)
+                {
+                    bld.Append(" ");
+                    bld.Append($"{a}");
+                    bld.AppendLine();
+                }
+                bld.AppendLine();
+            }
+
+            // help for keys
+            foreach (var hd in helpList)
             {
                 bld.Append(pfx);
                 bld.Append(hd.key);
