@@ -42,11 +42,29 @@ namespace CliArgs
             // help for actions
             if ((descr.actions != null) && (descr.actions.Length > 0))
             {
+                int maxactlen = MaxLen(descr.actions);
                 bld.AppendLine("Actions:");
+                const string actpfx = "  ";
                 foreach (var a in descr.actions)
                 {
-                    bld.Append(" ");
+                    bld.Append(actpfx);
                     bld.Append($"{a}");
+                    bld.Append(' ', maxactlen - a.Length + 1);
+                    int used = maxactlen + 1 + actpfx.Length;
+                    if (descr.actHelp.TryGetValue(a, out var acthelp))
+                    {
+                        acthelp = acthelp.TrimEnd();
+                        if (used < 30)
+                        {
+                            bld.Append(acthelp);
+                        }
+                        else
+                        {
+                            bld.AppendLine();
+                            bld.Append(' ', 8);
+                            bld.Append(acthelp);
+                        }
+                    }
                     bld.AppendLine();
                 }
                 bld.AppendLine();
@@ -77,7 +95,18 @@ namespace CliArgs
         }
 
 
-
+        public static int MaxLen(IEnumerable<string> list)
+        {
+            if (list == null) return 0;
+            int result = 0;
+            foreach(var s in list)
+            {
+                if (string.IsNullOrWhiteSpace(s))
+                    continue;
+                result = Math.Max(result, s.Length);
+            }
+            return result;
+        }
 
         public static string GetSortKey(CliArgKey k)
         {

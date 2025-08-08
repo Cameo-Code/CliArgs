@@ -212,7 +212,7 @@ namespace CliArgs
             }
             if (actval == null) return;
             
-            if (actval.member.DeclaringType == typeof(bool))
+            if (actval.member.GetPropFieldType() == typeof(bool))
                 ApplyToMemberBool(actval.member, true);
             else 
                 ApplyToMember(actval.member, action);

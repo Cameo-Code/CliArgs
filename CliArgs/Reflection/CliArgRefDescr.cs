@@ -50,6 +50,14 @@ namespace CliArgs
         {
             List<CliArgKey> keys = new List<CliArgKey>();
             List<ValueByReflect> vals = dst.vals;
+            Dictionary<string, string> actHelp;
+
+            StringComparer cmp = null;
+            if (dst.isCaseSensitive)
+                cmp = StringComparer.InvariantCulture;
+            else
+                cmp = StringComparer.InvariantCultureIgnoreCase;
+            actHelp = new Dictionary<string, string>(cmp);
 
             foreach (var mm in tp.GetMembers(BindingFlags.Public 
                 | BindingFlags.NonPublic 
@@ -129,7 +137,10 @@ namespace CliArgs
                     var vr = new ValueByReflect(mm, -1);
                     vr.isAction = true;
                     foreach (var aa in actStr)
+                    {
                         dst.acts[aa] = vr;
+                        actHelp[aa] = hl.ToString();
+                    }
                     if (isAnyAction)
                         dst.defAction = vr;
                 }
@@ -146,7 +157,7 @@ namespace CliArgs
             }
             else
                 dst.actionUse = ActionUse.None;
-
+            dst.actHelp = actHelp;
         }
 
         public static CliArgRefDescr Alloc(Type tp, CliArgDescr basedecl = null)

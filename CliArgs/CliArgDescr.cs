@@ -121,7 +121,7 @@ namespace CliArgs
     }
 
 
-    // The description of the expected argulemtns
+    // The description of the expected argulemnts
     public class CliArgDescr : CliArgSetOfKeys
     {
         public string[] fullKeyPrefix; // i.e. --
@@ -147,6 +147,7 @@ namespace CliArgs
         // the list of the possible actions. 
         public string[] actions;
 
+        public Dictionary<string, string> actHelp = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
         public static CliArgDescr Default2000 = new CliArgDescr {
             fullKeyPrefix = new string[] { "--" },

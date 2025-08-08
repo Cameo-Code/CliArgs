@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 
 namespace CliArgs
 {
@@ -21,6 +22,17 @@ namespace CliArgs
             if (tp == null) return false;
             Type ienum = typeof(ICollection<string>);
             return ienum.IsAssignableFrom(tp);
+        }
+
+        public static Type GetFieldPropType(this MemberInfo mem)
+        {
+            return GetPropFieldType(mem);
+        }
+        public static Type GetPropFieldType(this MemberInfo mem)
+        {
+            if (mem is FieldInfo f) return f.FieldType;
+            else if (mem is PropertyInfo p) return p.PropertyType;
+            return null;
         }
     }
 }
