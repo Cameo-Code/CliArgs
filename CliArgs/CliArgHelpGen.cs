@@ -77,7 +77,27 @@ namespace CliArgs
                 bld.Append(hd.key);
                 bld.Append(' ', maxLen - hd.key.Length);
                 bld.Append(": ");
-                bld.Append(hd.keyDescr.helpDescr);
+                if (hd.keyDescr.helpDescr.IndexOfAny(new char[] { '\r', '\n' }) < 0)
+                {
+                    bld.Append(hd.keyDescr.helpDescr);
+                } else
+                {
+                    string[] descrLines = hd.keyDescr.helpDescr.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                    string p = new string(' ', maxLen + 2);
+                    bool isFirst = true;
+                    foreach(var l in descrLines)
+                    {
+                        if (!isFirst)
+                        {
+                            bld.AppendLine();
+                            bld.Append(p);
+                        }
+                        else
+                            isFirst = false;
+                        bld.Append(l);
+                    }
+                    //bld.Append();
+                }
                 bld.AppendLine();
             }
             return bld.ToString();
